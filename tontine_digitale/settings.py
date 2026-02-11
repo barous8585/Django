@@ -188,10 +188,13 @@ os.makedirs(STATIC_ROOT, exist_ok=True)
 
 # SÉCURITÉ RENFORCÉE (Production)
 if not DEBUG:
-    # Force HTTPS
-    SECURE_SSL_REDIRECT = True
+    # Railway gère déjà HTTPS via proxy, pas besoin de forcer la redirection
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    
+    # Configurer le header proxy pour Railway
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     
     # Sécurité des cookies
     SECURE_HSTS_SECONDS = 31536000  # 1 an
