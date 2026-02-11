@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .description {
+            color: #666;
+            font-size: 1.2em;
+        }
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            font-size: 1.4em;
+            color: #333;
+            font-weight: bold;
+            flex: 1;
+        }
+        .badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        .badge-verified { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .badge-gold { background: linear-gradient(135deg, #f2994a, #f2c94c); }
+        .badge-trade { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        
+        .category-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .category-TEXTILE { background: #e3f2fd; color: #1976d2; }
+        .category-ELECTRO { background: #fff3e0; color: #f57c00; }
+        .category-BEAUTE { background: #fce4ec; color: #c2185b; }
+        .category-MAISON { background: #e8f5e9; color: #388e3c; }
+        
+        .card-content {
+            color: #555;
+            line-height: 1.6;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .info-value {
+            color: #666;
+            text-align: right;
+        }
+        .highlight {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .highlight-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .highlight-text {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .btn-detail {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        .btn-detail:hover {
+            transform: scale(1.05);
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-5px);
+        }
+        .experience {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8f9fa;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">← Retour Accueil</a>
+        </div>
+
+        <header>
+            <h1>{{ title }}</h1>
+            <p class="description">{{ description }}</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Total Fournisseurs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.textile }}</div>
+                <div class="stat-label">👕 Textile</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.electro }}</div>
+                <div class="stat-label">📱 Électronique</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.beaute }}</div>
+                <div class="stat-label">💄 Beauté</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.maison }}</div>
+                <div class="stat-label">🏠 Maison</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">🔍 Filtrer par catégorie:</span>
+                <a href="?" class="filter-btn {% if not categorie_filter %}active{% endif %}">Tous</a>
+                <a href="?categorie=TEXTILE" class="filter-btn {% if categorie_filter == 'TEXTILE' %}active{% endif %}">👕 Textile</a>
+                <a href="?categorie=ELECTRO" class="filter-btn {% if categorie_filter == 'ELECTRO' %}active{% endif %}">📱 Électronique</a>
+                <a href="?categorie=BEAUTE" class="filter-btn {% if categorie_filter == 'BEAUTE' %}active{% endif %}">💄 Beauté</a>
+                <a href="?categorie=MAISON" class="filter-btn {% if categorie_filter == 'MAISON' %}active{% endif %}">🏠 Maison</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            {% for fournisseur in fournisseurs %}
+            <div class="card">
+                <span class="category-tag category-{{ fournisseur.categorie }}">
+                    {{ fournisseur.get_categorie_display }}
+                </span>
+                
+                <div class="card-header">
+                    <h3 class="card-title">{{ fournisseur.nom }}</h3>
+                    <span class="badge {% if 'Verified' in fournisseur.badges_confiance %}badge-verified{% elif 'Gold' in fournisseur.badges_confiance %}badge-gold{% else %}badge-trade{% endif %}">
+                        {{ fournisseur.get_badge_icon }} {{ fournisseur.badges_confiance }}
+                    </span>
+                </div>
+
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">🏭 Spécialité</span>
+                        <span class="info-value">{{ fournisseur.specialite }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">📦 MOQ</span>
+                        <span class="info-value">{{ fournisseur.moq }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">🌍 Pays</span>
+                        <span class="info-value">{{ fournisseur.get_pays_origine_display }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">⏳ Expérience</span>
+                        <span class="info-value">
+                            <span class="experience">
+                                {{ fournisseur.annees_experience }} ans
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="highlight">
+                    <div class="highlight-title">💡 Pourquoi ce fournisseur ?</div>
+                    <div class="highlight-text">{{ fournisseur.argument_vente }}</div>
+                </div>
+
+                <a href="/api/fournisseurs/{{ fournisseur.id }}/" class="btn-detail">
+                    Voir les détails complets →
+                </a>
+            </div>
+            {% empty %}
+            <div class="card" style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                <p style="font-size: 1.5em; color: #999;">Aucun fournisseur trouvé dans cette catégorie</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

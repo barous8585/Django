@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participer à un Conteneur - Commerçant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">📦 Tontine Digitale</h1>
+                <div class="flex gap-4">
+                    <a href="/commercant/dashboard/" class="hover:bg-blue-700 px-4 py-2 rounded transition">📊 Dashboard</a>
+                    <a href="/commercant/participer/" class="bg-blue-700 px-4 py-2 rounded">➕ Participer</a>
+                    <a href="/commercant/historique/" class="hover:bg-blue-700 px-4 py-2 rounded transition">📜 Historique</a>
+                    <a href="/commercant/profil/" class="hover:bg-blue-700 px-4 py-2 rounded transition">👤 Profil</a>
+                    <a href="/logout/" class="hover:bg-red-600 px-4 py-2 rounded transition">🚪 Déconnexion</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenu Principal -->
+        <div class="container mx-auto p-8">
+            <div class="bg-white rounded-lg shadow-xl p-8 max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">➕ Participer à un Conteneur</h2>
+                
+                <!-- Formulaire de Participation -->
+                <form id="participationForm" class="space-y-6">
+                    <!-- Sélection du Conteneur -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">📦 Conteneur Disponible</label>
+                        <select id="conteneur" name="conteneur" class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" required>
+                            <option value="">Chargement...</option>
+                        </select>
+                        <div id="conteneurInfo" class="mt-4 p-4 bg-blue-50 rounded-lg hidden">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-600">Objectif</p>
+                                    <p class="font-bold text-lg" id="infoObjectif">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">Progression</p>
+                                    <p class="font-bold text-lg" id="infoProgression">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">Étape</p>
+                                    <p class="font-bold" id="infoEtape">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">Capacité CBM</p>
+                                    <p class="font-bold" id="infoCapacite">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Montant de Participation -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">💰 Montant de Participation (GNF)</label>
+                        <input type="number" id="montant" name="montant" min="100000" step="10000" 
+                               class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" 
+                               placeholder="Ex: 5 000 000" required>
+                        <p class="text-gray-500 text-sm mt-2">💡 Minimum : 100 000 GNF</p>
+                    </div>
+
+                    <!-- Référence de Paiement -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">📱 Référence de Paiement (Orange Money)</label>
+                        <input type="text" id="reference" name="reference" 
+                               class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" 
+                               placeholder="Ex: OM20260211ABCD1234" required>
+                        <p class="text-gray-500 text-sm mt-2">ℹ️ Numéro de transaction Orange Money</p>
+                    </div>
+
+                    <!-- Upload Preuve de Paiement -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">📸 Preuve de Paiement (Photo du Reçu)</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition cursor-pointer"
+                             onclick="document.getElementById('preuve').click()">
+                            <input type="file" id="preuve" name="preuve" accept="image/*" class="hidden" onchange="previewImage(event)">
+                            <div id="uploadPlaceholder">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p class="mt-2 text-gray-600">Cliquer pour choisir une image</p>
+                                <p class="text-gray-400 text-sm">PNG, JPG jusqu'à 10MB</p>
+                            </div>
+                            <div id="imagePreview" class="hidden">
+                                <img id="previewImg" class="max-h-64 mx-auto rounded-lg">
+                                <p class="mt-2 text-green-600 font-semibold">✅ Image chargée</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition">
+                            ✅ Confirmer la Participation
+                        </button>
+                        <a href="/commercant/dashboard/" class="flex-1 bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold text-center hover:bg-gray-400 transition">
+                            ❌ Annuler
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Message de Succès/Erreur -->
+                <div id="message" class="mt-6 hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charger les conteneurs disponibles
+        async function loadConteneurs() {
+            try {
+                const response = await axios.get('/api/conteneurs/?format=json');
+                const conteneurs = response.data;
+                const select = document.getElementById('conteneur');
+                
+                select.innerHTML = '<option value="">-- Sélectionner un conteneur --</option>';
+                
+                conteneurs
+                    .filter(c => c.etape === 'collecte')
+                    .forEach(c => {
+                        const option = document.createElement('option');
+                        option.value = c.id;
+                        option.textContent = `${c.nom} (${c.progression}% rempli)`;
+                        option.dataset.conteneur = JSON.stringify(c);
+                        select.appendChild(option);
+                    });
+            } catch (error) {
+                console.error('Erreur chargement conteneurs:', error);
+            }
+        }
+
+        // Afficher les infos du conteneur sélectionné
+        document.getElementById('conteneur').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (selected.dataset.conteneur) {
+                const conteneur = JSON.parse(selected.dataset.conteneur);
+                document.getElementById('infoObjectif').textContent = `${conteneur.objectif_en_gnf.toLocaleString()} GNF`;
+                document.getElementById('infoProgression').textContent = `${conteneur.progression}%`;
+                document.getElementById('infoEtape').textContent = {
+                    'collecte': '💰 Collecte',
+                    'mer': '🚢 En Mer',
+                    'port': '🏭 Au Port'
+                }[conteneur.etape];
+                document.getElementById('infoCapacite').textContent = `${conteneur.volume_total_cbm || 0} / ${conteneur.capacite_max_cbm} CBM`;
+                document.getElementById('conteneurInfo').classList.remove('hidden');
+            } else {
+                document.getElementById('conteneurInfo').classList.add('hidden');
+            }
+        });
+
+        // Prévisualiser l'image
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Soumettre la participation
+        document.getElementById('participationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('conteneur', document.getElementById('conteneur').value);
+            formData.append('montant', document.getElementById('montant').value);
+            formData.append('reference_paiement', document.getElementById('reference').value);
+            
+            const preuveFile = document.getElementById('preuve').files[0];
+            if (preuveFile) {
+                formData.append('preuve_paiement', preuveFile);
+            }
+
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const response = await axios.post('/api/participations/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+
+                messageDiv.className = 'mt-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg text-green-800';
+                messageDiv.innerHTML = `
+                    <p class="font-bold text-lg">✅ Participation enregistrée avec succès !</p>
+                    <p class="mt-2">Montant : ${parseInt(document.getElementById('montant').value).toLocaleString()} GNF</p>
+                    <p>Statut : ⏳ En attente de validation</p>
+                    <p class="mt-4"><a href="/commercant/dashboard/" class="text-blue-600 underline">Retour au Dashboard</a></p>
+                `;
+                messageDiv.classList.remove('hidden');
+
+                // Réinitialiser le formulaire
+                this.reset();
+                document.getElementById('uploadPlaceholder').classList.remove('hidden');
+                document.getElementById('imagePreview').classList.add('hidden');
+                document.getElementById('conteneurInfo').classList.add('hidden');
+
+            } catch (error) {
+                messageDiv.className = 'mt-6 p-4 bg-red-100 border-2 border-red-500 rounded-lg text-red-800';
+                messageDiv.innerHTML = `
+                    <p class="font-bold text-lg">❌ Erreur lors de l'enregistrement</p>
+                    <p class="mt-2">${error.response?.data?.detail || 'Une erreur est survenue. Veuillez réessayer.'}</p>
+                `;
+                messageDiv.classList.remove('hidden');
+            }
+        });
+
+        // Fonction pour récupérer le CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Charger les conteneurs au chargement de la page
+        loadConteneurs();
+    </script>
+</body>
+</html>

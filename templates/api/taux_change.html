@@ -1,0 +1,69 @@
+{% extends 'api/base_v2.html' %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ taux|length }}</div>
+        <div class="stat-label">Devises disponibles</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ actifs }}</div>
+        <div class="stat-label">Taux actifs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ inactifs }}</div>
+        <div class="stat-label">Taux inactifs</div>
+    </div>
+</div>
+
+{% if taux %}
+<div class="data-grid">
+    {% for t in taux %}
+    <div class="data-card">
+        <h3>💱 {{ t.get_devise_display }}</h3>
+        <div class="data-item">
+            <span class="data-label">Code devise</span>
+            <span class="data-value"><strong>{{ t.devise }}</strong></span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Taux de conversion</span>
+            <span class="data-value">
+                <strong style="color: #667eea; font-size: 1.3em;">
+                    1 {{ t.devise }} = {{ t.taux_gnf|floatformat:2 }} GNF
+                </strong>
+            </span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Statut</span>
+            <span class="data-value">
+                {% if t.actif %}
+                <span class="badge badge-success">✓ Actif</span>
+                {% else %}
+                <span class="badge badge-danger">✗ Inactif</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Date d'application</span>
+            <span class="data-value">{{ t.date_application|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Exemple de conversion</span>
+            <span class="data-value" style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                100 {{ t.devise }} = {{ t.taux_gnf|floatformat:2|add:"00" }} GNF<br>
+                1000 {{ t.devise }} = {% widthratio t.taux_gnf 1 1000 %} GNF
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h2>Aucun taux de change configuré</h2>
+    <p>Configurez les taux de change depuis l'admin</p>
+</div>
+{% endif %}
+{% endblock %}

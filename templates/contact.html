@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactez-nous</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .contact-info {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        .contact-icon {
+            font-size: 2em;
+            width: 50px;
+            text-align: center;
+        }
+        .contact-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .contact-value {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        .btn-back {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s;
+            text-align: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-back:hover {
+            transform: scale(1.02);
+        }
+        .note {
+            background: #fffbe6;
+            border-left: 4px solid #faad14;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📞 Contactez-nous</h1>
+            <p class="description">
+                Vous êtes intéressé par un de nos fournisseurs ? Nous sommes là pour vous aider !
+            </p>
+
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon">📱</div>
+                    <div>
+                        <div class="contact-label">WhatsApp / Téléphone</div>
+                        <div class="contact-value">+224 620 000 000</div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">✉️</div>
+                    <div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">contact@tontinedigitale.com</div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">🕒</div>
+                    <div>
+                        <div class="contact-label">Horaires</div>
+                        <div class="contact-value">Lun-Sam : 9h - 18h</div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <div>
+                        <div class="contact-label">Adresse</div>
+                        <div class="contact-value">Madina Market, Conakry, Guinée</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>💡 Astuce :</strong> Mentionnez le nom du fournisseur qui vous intéresse pour une réponse plus rapide !
+            </div>
+
+            <a href="javascript:history.back()" class="btn-back">
+                ← Retour
+            </a>
+        </div>
+    </div>
+</body>
+</html>

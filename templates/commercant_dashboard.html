@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace - Tontine Digitale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .user-details h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .user-details p {
+            color: #666;
+        }
+        .wallet-card {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .wallet-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .wallet-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .action-btn {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #333;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .action-btn:hover {
+            transform: translateY(-5px);
+        }
+        .action-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .action-label {
+            font-weight: bold;
+        }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .participation-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+        }
+        .participation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .participation-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .status-valide {
+            background: #28a745;
+            color: white;
+        }
+        .status-attente {
+            background: #ffc107;
+            color: #333;
+        }
+        .participation-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            font-weight: bold;
+            color: #333;
+        }
+        .progress-bar {
+            background: #e9ecef;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s;
+            margin-top: 15px;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+        }
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #666;
+            flex: 1;
+        }
+        .nav-item.active {
+            color: #667eea;
+        }
+        .nav-icon {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        .nav-label {
+            font-size: 0.75em;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 80px;
+            }
+            .wallet-amount {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <div class="user-avatar">{{ user.telephone|slice:"-2:" }}</div>
+            <div class="user-details">
+                <h2>{{ user.telephone }}</h2>
+                <p>Commerçant - Membre depuis {{ user.date_joined|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="wallet-card">
+        <div class="wallet-label">💰 Mon Portefeuille</div>
+        <div class="wallet-amount">{{ portefeuille.solde|floatformat:0 }} GNF</div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="/api/conteneurs/" class="action-btn">
+            <div class="action-icon">📦</div>
+            <div class="action-label">Conteneurs</div>
+        </a>
+        <a href="/commercant/participer/" class="action-btn">
+            <div class="action-icon">🤝</div>
+            <div class="action-label">Participer</div>
+        </a>
+        <a href="/api/fournisseurs/" class="action-btn">
+            <div class="action-icon">🏭</div>
+            <div class="action-label">Fournisseurs</div>
+        </a>
+        <a href="/commercant/historique/" class="action-btn">
+            <div class="action-icon">📜</div>
+            <div class="action-label">Historique</div>
+        </a>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">
+            <span>🤝</span>
+            Mes Participations Actives
+        </h3>
+
+        {% if participations %}
+            {% for participation in participations %}
+            <div class="participation-card">
+                <div class="participation-header">
+                    <div class="participation-title">📦 {{ participation.conteneur.nom }}</div>
+                    <span class="status-badge {% if participation.valide %}status-valide{% else %}status-attente{% endif %}">
+                        {% if participation.valide %}✓ Validé{% else %}⏳ En attente{% endif %}
+                    </span>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ participation.conteneur.get_progression }}%">
+                        {{ participation.conteneur.get_progression|floatformat:1 }}%
+                    </div>
+                </div>
+
+                <div class="participation-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Mon investissement</span>
+                        <span class="detail-value">{{ participation.montant|floatformat:0 }} GNF</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Objectif total</span>
+                        <span class="detail-value">{{ participation.conteneur.get_objectif_en_gnf|floatformat:0 }} GNF</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Étape actuelle</span>
+                        <span class="detail-value">{{ participation.conteneur.get_etape_display }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date participation</span>
+                        <span class="detail-value">{{ participation.date_participation|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+
+                {% if not participation.valide %}
+                <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 5px; font-size: 0.9em;">
+                    ⏳ Votre paiement est en cours de vérification
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p>Vous n'avez pas encore de participations</p>
+                <a href="/api/conteneurs/" class="btn-primary">Explorer les conteneurs</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">
+            <span>📊</span>
+            Mes Statistiques
+        </h3>
+
+        <div class="participation-details">
+            <div class="detail-item">
+                <span class="detail-label">Total investi</span>
+                <span class="detail-value" style="color: #667eea; font-size: 1.3em;">
+                    {{ stats.total_investi|floatformat:0 }} GNF
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Participations</span>
+                <span class="detail-value" style="color: #667eea; font-size: 1.3em;">
+                    {{ stats.nb_participations }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Conteneurs actifs</span>
+                <span class="detail-value" style="color: #667eea; font-size: 1.3em;">
+                    {{ stats.nb_conteneurs }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Validés</span>
+                <span class="detail-value" style="color: #28a745; font-size: 1.3em;">
+                    {{ stats.valides }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="/commercant/dashboard/" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Accueil</div>
+        </a>
+        <a href="/api/conteneurs/" class="nav-item">
+            <div class="nav-icon">📦</div>
+            <div class="nav-label">Conteneurs</div>
+        </a>
+        <a href="/api/fournisseurs/" class="nav-item">
+            <div class="nav-icon">🏭</div>
+            <div class="nav-label">Fournisseurs</div>
+        </a>
+        <a href="/commercant/profil/" class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Profil</div>
+        </a>
+    </nav>
+</body>
+</html>

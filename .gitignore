@@ -1,0 +1,26 @@
+.venv/
+*.pyc
+__pycache__/
+db.sqlite3
+.DS_Store
+.idea/
+*.log
+
+# Environment variables (IMPORTANT!)
+.env
+.env.local
+.env.*.local
+config.env
+
+# Media files (uploaded by users)
+media/
+staticfiles/
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# Backups
+*.bak
+*.backup

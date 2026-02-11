@@ -1,0 +1,264 @@
+{% extends 'api/base_v2.html' %}
+
+{% block content %}
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    
+    .chart-card {
+        background: var(--bg-card);
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .chart-card h3 {
+        color: var(--accent-color);
+        margin-bottom: 20px;
+    }
+    
+    .export-buttons {
+        display: flex;
+        gap: 15px;
+        margin: 30px 0;
+        flex-wrap: wrap;
+    }
+    
+    .export-btn {
+        padding: 12px 25px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .alert-card {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+    
+    [data-theme="dark"] .alert-card {
+        background: #3d3a1a;
+        border-left: 4px solid #ffc107;
+    }
+</style>
+
+<div class="stats">
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="stat-value">{{ stats.total_conteneurs }}</div>
+        <div class="stat-label">Conteneurs actifs</div>
+    </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <div class="stat-value">{{ stats.total_participants }}</div>
+        <div class="stat-label">Participants</div>
+    </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <div class="stat-value">{{ stats.total_collecte|floatformat:0 }}</div>
+        <div class="stat-label">Collecté (GNF)</div>
+    </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+        <div class="stat-value">{{ stats.en_attente }}</div>
+        <div class="stat-label">Paiements en attente</div>
+    </div>
+</div>
+
+{% if stats.en_attente > 0 %}
+<div class="alert-card">
+    <h3 style="margin-bottom: 10px;">⚠️ Alerte : {{ stats.en_attente }} paiement(s) en attente de validation</h3>
+    <p>Des participations nécessitent votre attention. <a href="/admin/core/participation/?valide__exact=0" style="color: #667eea;">Voir les paiements en attente →</a></p>
+</div>
+{% endif %}
+
+<div class="export-buttons">
+    <a href="?export=conteneurs" class="export-btn">📦 Exporter Conteneurs (CSV)</a>
+    <a href="?export=participations" class="export-btn">🤝 Exporter Participations (CSV)</a>
+    <a href="?export=transactions" class="export-btn">📝 Exporter Transactions (CSV)</a>
+    <a href="?export=all" class="export-btn" style="background: #28a745;">📊 Exporter Tout (Excel)</a>
+</div>
+
+<div class="dashboard-grid">
+    <div class="chart-card">
+        <h3>📈 Progression des Conteneurs</h3>
+        <canvas id="conteneurChart"></canvas>
+    </div>
+    
+    <div class="chart-card">
+        <h3>💰 Collectes par Conteneur</h3>
+        <canvas id="collecteChart"></canvas>
+    </div>
+    
+    <div class="chart-card">
+        <h3>🤝 Participations par Statut</h3>
+        <canvas id="statusChart"></canvas>
+    </div>
+    
+    <div class="chart-card">
+        <h3>📊 Évolution des Participations (7 derniers jours)</h3>
+        <canvas id="evolutionChart"></canvas>
+    </div>
+</div>
+
+<h2 style="margin: 40px 0 20px; color: var(--text-primary);">📋 Activité Récente</h2>
+<div class="data-grid">
+    {% for transaction in transactions_recentes %}
+    <div class="data-card">
+        <h3>
+            {% if transaction.type_transaction == 'depot' %}💵
+            {% elif transaction.type_transaction == 'retrait' %}💸
+            {% elif transaction.type_transaction == 'participation' %}🤝
+            {% else %}♻️{% endif %}
+            {{ transaction.get_type_transaction_display }}
+        </h3>
+        <div class="data-item">
+            <span class="data-label">Utilisateur</span>
+            <span class="data-value">{{ transaction.portefeuille.utilisateur.telephone }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Montant</span>
+            <span class="data-value"><strong>{{ transaction.montant|floatformat:0 }} GNF</strong></span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Date</span>
+            <span class="data-value">{{ transaction.date_transaction|date:"d/m/Y H:i" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+const theme = document.documentElement.getAttribute('data-theme');
+const chartColors = {
+    primary: '#667eea',
+    success: '#28a745',
+    warning: '#ffc107',
+    danger: '#dc3545',
+    info: '#17a2b8',
+    text: theme === 'dark' ? '#ffffff' : '#333333'
+};
+
+// Chart 1: Progression des Conteneurs
+const ctx1 = document.getElementById('conteneurChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: {{ conteneur_labels|safe }},
+        datasets: [{
+            label: 'Progression (%)',
+            data: {{ conteneur_data|safe }},
+            backgroundColor: chartColors.primary,
+            borderRadius: 10
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { labels: { color: chartColors.text } }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { color: chartColors.text },
+                grid: { color: theme === 'dark' ? '#3d3d5c' : '#e0e0e0' }
+            },
+            x: {
+                ticks: { color: chartColors.text },
+                grid: { color: theme === 'dark' ? '#3d3d5c' : '#e0e0e0' }
+            }
+        }
+    }
+});
+
+// Chart 2: Collectes par Conteneur
+const ctx2 = document.getElementById('collecteChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: {{ conteneur_labels|safe }},
+        datasets: [{
+            data: {{ collecte_data|safe }},
+            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { labels: { color: chartColors.text } }
+        }
+    }
+});
+
+// Chart 3: Statut des Participations
+const ctx3 = document.getElementById('statusChart').getContext('2d');
+new Chart(ctx3, {
+    type: 'pie',
+    data: {
+        labels: ['Validées', 'En attente'],
+        datasets: [{
+            data: [{{ stats.validees }}, {{ stats.en_attente }}],
+            backgroundColor: [chartColors.success, chartColors.warning]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { labels: { color: chartColors.text } }
+        }
+    }
+});
+
+// Chart 4: Évolution des Participations
+const ctx4 = document.getElementById('evolutionChart').getContext('2d');
+new Chart(ctx4, {
+    type: 'line',
+    data: {
+        labels: {{ evolution_labels|safe }},
+        datasets: [{
+            label: 'Participations par jour',
+            data: {{ evolution_data|safe }},
+            borderColor: chartColors.primary,
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { labels: { color: chartColors.text } }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { color: chartColors.text },
+                grid: { color: theme === 'dark' ? '#3d3d5c' : '#e0e0e0' }
+            },
+            x: {
+                ticks: { color: chartColors.text },
+                grid: { color: theme === 'dark' ? '#3d3d5c' : '#e0e0e0' }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

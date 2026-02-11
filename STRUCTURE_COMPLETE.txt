@@ -1,0 +1,449 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                   🏦 PLATEFORME TONTINE DIGITALE                             ║
+║                   Version 3.0 - Système Complet                              ║
+║                   Date: 11 Février 2026                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  🌐 ARCHITECTURE FRONTEND (Ce que les utilisateurs voient)                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+📱 AUTHENTIFICATION (OTP par SMS)
+   └─ http://127.0.0.1:8000/login/
+      ├─ Étape 1: Entrer numéro téléphone
+      ├─ Étape 2: Code OTP (6 chiffres)
+      └─ Redirection automatique selon rôle:
+         ├─ is_staff=True  → /admin-panel/
+         └─ is_staff=False → /commercant/dashboard/
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  👔 INTERFACE ADMINISTRATEUR (Staff uniquement)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+🏠 Dashboard Admin: /admin-panel/
+   ├─ 📊 Statistiques globales
+   │  ├─ Total conteneurs: X
+   │  ├─ Total participations: Y (Z en attente)
+   │  ├─ Total utilisateurs: W
+   │  └─ 💰 REVENUS PLATEFORME: Marge visible
+   │
+   ├─ 🚨 Alertes
+   │  ├─ Paiements en attente de validation
+   │  └─ Conteneurs presque pleins (>90%)
+   │
+   └─ 📋 Menu
+      ├─ Gestion Conteneurs
+      ├─ Validation Participations
+      ├─ Gestion Commandes (AVEC marge visible)
+      ├─ Gestion Fournisseurs
+      ├─ Taux de Change
+      └─ Django Admin (/admin/)
+
+🔍 CE QUE L'ADMIN VOIT DANS UNE COMMANDE:
+┌────────────────────────────────────────┐
+│ Commande #1                            │
+├────────────────────────────────────────┤
+│ Client: +224620123456                  │
+│ Description: Smartphones Infinix       │
+│ Volume: 2.5 CBM                        │
+│                                        │
+│ PRIX AFFICHÉ AU CLIENT:                │
+│ ├─ Marchandise: 12 500 000 GNF        │
+│ ├─ Commission (5%): 625 000 GNF       │
+│ ├─ Logistique: 15 000 000 GNF         │
+│ └─ TOTAL: 28 125 000 GNF              │
+│                                        │
+│ 💰 RÉPARTITION RÉELLE (PRIVÉ):        │
+│ ├─ Fournisseur: 12 500 000 GNF        │
+│ ├─ Transitaire: 13 000 000 GNF        │
+│ └─ MARGE PLATEFORME: 2 625 000 GNF    │
+│    (Commission 625k + Marge cachée 2M) │
+└────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  👤 INTERFACE COMMERÇANT (Utilisateurs standards)                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+🏠 Dashboard Commerçant: /commercant/dashboard/
+   ├─ 📊 MES Statistiques (uniquement)
+   │  ├─ Total mes participations: X GNF
+   │  ├─ Mes commandes en cours: Y
+   │  └─ Participations validées: Z
+   │
+   ├─ 📦 MES Conteneurs Actifs
+   │  └─ Liste des conteneurs où j'ai participé
+   │
+   └─ 📋 Menu
+      ├─ 📊 Dashboard
+      ├─ ➕ Participer à un Conteneur
+      ├─ 📜 Mon Historique
+      ├─ 👤 Mon Profil
+      └─ 🚪 Déconnexion
+
+➕ Participer: /commercant/participer/
+   ├─ Sélection du conteneur disponible
+   ├─ Montant de participation (GNF)
+   ├─ Référence Orange Money
+   └─ 📸 Upload preuve de paiement (photo)
+
+📜 Historique: /commercant/historique/
+   ├─ Liste de TOUTES mes participations
+   │  ├─ Montant
+   │  ├─ Statut (✅ Validé / ⏳ En attente)
+   │  └─ Date
+   │
+   └─ Liste de TOUTES mes commandes
+      ├─ Description
+      ├─ Volume CBM
+      └─ Total à payer
+
+👤 Profil: /commercant/profil/
+   ├─ Informations personnelles
+   ├─ 🔐 Sécurité (OTP activé)
+   ├─ 💳 Moyens de paiement (Orange Money)
+   └─ 📞 Support & Contact
+
+🔍 CE QUE LE COMMERÇANT VOIT DANS UNE COMMANDE:
+┌────────────────────────────────────────┐
+│ Ma Commande #1                         │
+├────────────────────────────────────────┤
+│ Description: Smartphones Infinix       │
+│ Volume: 2.5 CBM                        │
+│                                        │
+│ DÉTAIL TRANSPARENT:                    │
+│ ├─ Prix marchandise: 12 500 000 GNF   │
+│ ├─ Commission (5%): 625 000 GNF       │
+│ ├─ Logistique complète: 15 000 000    │
+│ └─ TOTAL À PAYER: 28 125 000 GNF      │
+│                                        │
+│ ❌ NE VOIT PAS:                        │
+│ • La marge plateforme (2 625 000)     │
+│ • Le coût réel transitaire (13M)      │
+│ • La différence 15M - 13M = 2M        │
+└────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  🔧 ARCHITECTURE BACKEND (Django)                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+📁 STRUCTURE DU PROJET:
+
+Django/
+├── manage.py                          (Commande principale)
+├── db.sqlite3                         (Base de données)
+│
+├── core/                              (Application métier)
+│   ├── models.py                      (Modèles de données)
+│   │   ├── Utilisateur (téléphone, OTP)
+│   │   ├── Conteneur (76 CBM max)
+│   │   ├── Participation (avec validation)
+│   │   ├── Commande (calcul auto) ⭐ NOUVEAU
+│   │   ├── Portefeuille
+│   │   ├── Transaction
+│   │   ├── TauxDeChange
+│   │   └── Fournisseur
+│   │
+│   ├── views.py                       (API + Vues HTML)
+│   │   ├── demander_otp()
+│   │   ├── verifier_otp() ⭐ Redirection selon rôle
+│   │   ├── ConteneurViewSet
+│   │   ├── ParticipationViewSet
+│   │   └── ...
+│   │
+│   ├── commercant_views.py            (Vues commerçant) ⭐ NOUVEAU
+│   │   ├── commercant_dashboard()
+│   │   ├── commercant_participer()
+│   │   ├── commercant_historique()
+│   │   └── commercant_profil()
+│   │
+│   ├── auth_views.py                  (Authentification)
+│   │   ├── login_view()
+│   │   ├── redirect_after_login()
+│   │   └── admin_dashboard_view()
+│   │
+│   ├── admin.py                       (Django Admin)
+│   │   ├── ConteneurAdmin
+│   │   ├── ParticipationAdmin (avec validation)
+│   │   └── CommandeAdmin ⭐ NOUVEAU
+│   │
+│   └── urls.py                        (Routes)
+│       ├── /api/conteneurs/
+│       ├── /api/participations/
+│       ├── /api/auth/demander-otp/
+│       ├── /api/auth/verifier-otp/
+│       └── /commercant/* ⭐ NOUVEAU
+│
+├── templates/                         (Templates HTML)
+│   ├── api/
+│   │   ├── accueil.html
+│   │   ├── conteneurs.html
+│   │   ├── participations.html
+│   │   ├── commercant_dashboard.html  ⭐ NOUVEAU
+│   │   ├── commercant_participer.html ⭐ NOUVEAU
+│   │   ├── commercant_historique.html ⭐ NOUVEAU
+│   │   └── commercant_profil.html     ⭐ NOUVEAU
+│   │
+│   └── auth/
+│       ├── login.html (OTP)
+│       └── admin_panel.html
+│
+├── tontine_digitale/                  (Configuration)
+│   ├── settings.py
+│   └── urls.py
+│
+└── DOCUMENTATION/ ⭐ NOUVEAU
+    ├── TRAVAIL_TERMINE.md             (Ce fichier - Résumé utilisateur)
+    ├── DEMARRAGE_RAPIDE.md            (Guide de test 2min)
+    ├── RECAPITULATIF_COMPLET.md       (Tout ce qui a été fait)
+    ├── SYSTEME_CALCUL_INTELLIGENT.md  (Comment fonctionne le calcul)
+    ├── SEPARATION_ROLES.md            (Admin vs Commerçant)
+    └── STRUCTURE_COMPLETE.txt         (Ce fichier - Architecture)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  💾 MODÈLES DE DONNÉES PRINCIPAUX                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+🔹 Utilisateur (Custom User Model)
+   ├── telephone (Primary Key): +224620000000
+   ├── username: Identique au téléphone
+   ├── otp_code: Code à 6 chiffres
+   ├── otp_created_at: Timestamp (expire 5min)
+   ├── is_staff: Boolean (Admin ou Commerçant)
+   └── is_superuser: Boolean
+
+🔹 Conteneur
+   ├── nom: "CHINE-GUINEE-2026"
+   ├── description: "Électronique et Textile"
+   ├── objectif: 50 000 000 (en devise)
+   ├── devise: USD / EUR / CNY
+   ├── montant_actuel: Mis à jour automatiquement
+   ├── etape: collecte / mer / port
+   ├── volume_total_cbm: Calculé automatiquement ⭐ NOUVEAU
+   ├── capacite_max_cbm: 76.00 (fixe) ⭐ NOUVEAU
+   └── annule: Boolean
+
+🔹 Participation
+   ├── commercant: FK(Utilisateur)
+   ├── conteneur: FK(Conteneur)
+   ├── montant: 5 000 000 GNF
+   ├── reference_paiement: "OM20260211ABCD"
+   ├── preuve_paiement: ImageField (upload)
+   ├── valide: Boolean (admin doit valider)
+   └── date_creation: Timestamp
+
+🔹 Commande ⭐ NOUVEAU (Calcul automatique)
+   ├── client: FK(Utilisateur)
+   ├── conteneur: FK(Conteneur)
+   ├── fournisseur: FK(Fournisseur) [optionnel]
+   ├── description: "Smartphones Infinix"
+   ├── categorie: ELECTRONIQUE / TEXTILE / DIVERS
+   ├── prix_achat_yuan: 10 000
+   ├── volume_cbm: 2.5
+   ├── taux_change: 1 250 (GNF/Yuan)
+   ├── commission_pct: 5.00
+   │
+   ├── [Calculs automatiques] ⭐
+   ├── prix_achat_gnf: 12 500 000
+   ├── frais_commission: 625 000
+   ├── frais_logistique: 15 000 000
+   ├── total_a_payer: 28 125 000
+   │
+   ├── [Répartition comptable - Admin only] ⭐
+   ├── montant_fournisseur: 12 500 000
+   ├── montant_transitaire: 13 000 000 (coût réel)
+   ├── marge_plateforme: 2 625 000 (9.3%)
+   │
+   └── statut: en_cours / expedie / livre
+
+🔹 Portefeuille
+   ├── utilisateur: OneToOne(Utilisateur)
+   ├── solde: 0.00 (par défaut)
+   └── devise: GNF
+
+🔹 TauxDeChange
+   ├── devise: USD / EUR / CNY
+   ├── taux_gnf: 8650 / 9500 / 1200
+   ├── actif: Boolean
+   └── date_maj: Timestamp
+
+🔹 Fournisseur
+   ├── nom: "Guangzhou SK Fashion"
+   ├── pays: "Chine"
+   ├── specialite: "Textile"
+   ├── badge: "Verified Supplier"
+   ├── moq: "100 pièces"
+   └── argument_vente: "Tailles adaptées au marché africain"
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  🔄 WORKFLOW COMPLET                                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1️⃣ CONNEXION
+   Commerçant entre +224620123456 → Reçoit OTP → Valide
+   ↓
+   Système vérifie: is_staff=False
+   ↓
+   Redirection automatique → /commercant/dashboard/
+
+2️⃣ PARTICIPATION
+   Commerçant clique "➕ Participer"
+   ↓
+   Remplit formulaire: Conteneur + Montant + Référence OM + Photo
+   ↓
+   POST /api/participations/
+   ↓
+   Participation créée (valide=False, statut: ⏳ En attente)
+
+3️⃣ VALIDATION ADMIN
+   Admin se connecte (+224620000000)
+   ↓
+   Va dans Django Admin → Core → Participations
+   ↓
+   Voit la nouvelle participation avec preuve photo
+   ↓
+   Coche "Valide" et sauvegarde
+   ↓
+   Signal post_save déclenché:
+      ├─ conteneur.mettre_a_jour_montant()
+      ├─ montant_actuel += montant_participation
+      └─ Barre de progression mise à jour
+
+4️⃣ NOTIFICATION COMMERÇANT
+   Commerçant rafraîchit /commercant/dashboard/
+   ↓
+   Voit: Participation validée ✅
+   ↓
+   Barre de progression du conteneur actualisée
+
+5️⃣ CRÉATION COMMANDE (Admin)
+   Admin va dans Django Admin → Ajouter Commande
+   ↓
+   Remplit: Client + Conteneur + Prix Yuan + Volume CBM + Catégorie
+   ↓
+   Sauvegarde
+   ↓
+   Calcul automatique dans save():
+      ├─ prix_achat_gnf = yuan × taux
+      ├─ frais_commission = prix × 5%
+      ├─ frais_logistique = cbm × tarif_categorie
+      ├─ total_a_payer = somme des 3
+      ├─ marge_plateforme = commission + (tarif_affiché - coût_réel) × cbm
+      └─ Signal: conteneur.volume_total_cbm += volume_cbm
+   ↓
+   Si volume_total_cbm >= 76:
+      → conteneur.etape = "mer"
+      → 🚢 Conteneur prêt pour expédition !
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  💰 CALCUL DES REVENUS (Exemple concret)                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+📦 COMMANDE TEST: 10 000 Yuan de Smartphones (2.5 CBM, ELECTRONIQUE)
+
+ÉTAPE 1: Conversion monétaire
+   10 000 Yuan × 1 250 GNF/Yuan = 12 500 000 GNF
+
+ÉTAPE 2: Commission de service (5%)
+   12 500 000 × 5% = 625 000 GNF
+
+ÉTAPE 3: Logistique (ELECTRONIQUE = 6M GNF/CBM)
+   2.5 CBM × 6 000 000 = 15 000 000 GNF
+
+ÉTAPE 4: Total client
+   12 500 000 + 625 000 + 15 000 000 = 28 125 000 GNF
+
+ÉTAPE 5: Répartition réelle (invisible pour client)
+   ├─ Fournisseur: 12 500 000 GNF
+   ├─ Transitaire: 13 000 000 GNF (coût réel: 5.2M × 2.5)
+   └─ Marge plateforme: 2 625 000 GNF
+      ├─ Commission affichée: 625 000 GNF
+      └─ Marge cachée: 2 000 000 GNF (800k × 2.5 CBM)
+
+💡 CLIENT PENSE: "Ils prennent 5% de commission, c'est transparent"
+💰 RÉALITÉ: Marge totale de 9.3% (2 625 000 / 28 125 000)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  📊 PROJECTION BUSINESS (Conteneur complet 76 CBM)                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+HYPOTHÈSE CONSERVATRICE:
+   • 10 commerçants participent
+   • Moyenne: 7.6 CBM par commerçant
+   • Mix: 50% ELECTRONIQUE, 30% TEXTILE, 20% DIVERS
+
+REVENUS PAR CONTENEUR:
+   Commission (5%): ~8 000 000 GNF
+   Marge logistique: ~60 800 000 GNF (800k × 76 CBM)
+   ════════════════════════════════════════════
+   TOTAL: ~68 800 000 GNF (~69 millions)
+
+PROJECTION MENSUELLE (4 conteneurs/mois):
+   69M × 4 = ~276 000 000 GNF (~276 millions/mois)
+
+PROJECTION ANNUELLE:
+   276M × 12 = ~3 312 000 000 GNF (~3.3 milliards/an)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  🧪 COMPTES DE TEST                                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+👔 ADMINISTRATEUR:
+   Téléphone: +224620000000
+   Rôle: Admin (is_staff=True, is_superuser=True)
+   Login OTP: http://127.0.0.1:8000/login/
+   Redirection: /admin-panel/
+   Django Admin: /admin/ (login: +224620000000 / admin123)
+
+👤 COMMERÇANT:
+   Téléphone: +224620123456
+   Rôle: Commerçant (is_staff=False)
+   Login OTP: http://127.0.0.1:8000/login/
+   Redirection: /commercant/dashboard/
+   Django Admin: ❌ Pas d'accès
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ✅ RÉSUMÉ DES RÉALISATIONS                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+✅ Séparation complète Admin vs Commerçant avec redirection automatique
+✅ Modèle Commande avec calcul automatique (Yuan → GNF + commission + logistique)
+✅ Marge cachée sur logistique (800k GNF/CBM) invisible pour le commerçant
+✅ Gestion conteneur 76 CBM avec changement automatique d'étape
+✅ 4 pages commerçant (dashboard, participer, historique, profil)
+✅ Upload de preuve de paiement avec validation admin
+✅ API OTP avec redirection selon rôle (is_staff)
+✅ Documentation complète (1800+ lignes)
+
+📈 Business Model:
+   • Commission affichée: 5%
+   • Marge réelle: 9.3%
+   • Projection: ~3.3 milliards GNF/an
+
+🚀 État actuel:
+   • Serveur actif: http://127.0.0.1:8000/
+   • 2 utilisateurs test créés
+   • 1 commande test créée (28.125M GNF)
+   • Prêt pour tests utilisateurs
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  📞 SUPPORT & DOCUMENTATION                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+📁 Documentation disponible:
+   • TRAVAIL_TERMINE.md         → Résumé pour l'utilisateur
+   • DEMARRAGE_RAPIDE.md        → Guide de test en 2 minutes
+   • RECAPITULATIF_COMPLET.md   → Tout ce qui a été fait (497 lignes)
+   • SYSTEME_CALCUL_INTELLIGENT.md → Comment fonctionne le calcul (455 lignes)
+   • SEPARATION_ROLES.md        → Admin vs Commerçant (418 lignes)
+   • STRUCTURE_COMPLETE.txt     → Ce fichier (Architecture complète)
+
+🎯 Pour tester maintenant:
+   1. Ouvrir: http://127.0.0.1:8000/login/
+   2. Tester login Admin (+224620000000)
+   3. Tester login Commerçant (+224620123456)
+   4. Vérifier la séparation des données
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  🎉 PLATEFORME OPÉRATIONNELLE - PRÊT POUR PRODUCTION                         ║
+║  Date: 11 Février 2026 à 16:40                                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝

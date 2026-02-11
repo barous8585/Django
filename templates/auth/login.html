@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Tontine Digitale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            width: 40px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .info-box p {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #dc3545;
+            padding: 12px;
+            border-radius: 8px;
+            color: #dc3545;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success-message {
+            background: #efe;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            border-radius: 8px;
+            color: #28a745;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        #otpStep {
+            display: none;
+        }
+        
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .otp-inputs input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 0;
+        }
+        
+        .otp-inputs input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .resend-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .resend-link button {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <h1>🏦 Tontine Digitale</h1>
+            <p>Connexion sécurisée</p>
+        </div>
+        
+        <div class="step-indicator">
+            <div class="step active" id="step1"></div>
+            <div class="step" id="step2"></div>
+        </div>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <!-- Étape 1: Entrer le numéro -->
+        <div id="phoneStep">
+            <form id="phoneForm">
+                <div class="form-group">
+                    <label for="telephone">Numéro de téléphone</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📱</span>
+                        <input 
+                            type="tel" 
+                            id="telephone" 
+                            name="telephone" 
+                            placeholder="+224 620 00 00 00"
+                            required
+                            pattern="^\+?[0-9]{10,15}$"
+                        >
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="phoneBtn">
+                    Recevoir le code OTP
+                </button>
+            </form>
+            
+            <div class="info-box">
+                <p>💡 Vous recevrez un code à 6 chiffres par SMS pour vérifier votre identité.</p>
+            </div>
+        </div>
+        
+        <!-- Étape 2: Vérifier le code OTP -->
+        <div id="otpStep">
+            <form id="otpForm">
+                <div class="form-group">
+                    <label>Code de vérification</label>
+                    <div class="otp-inputs">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="0">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="otpBtn">
+                    Vérifier et se connecter
+                </button>
+            </form>
+            
+            <div class="resend-link">
+                <button onclick="resendOTP()">Renvoyer le code</button>
+            </div>
+            
+            <div class="info-box">
+                <p>⏱️ Le code expire dans <strong id="timer">5:00</strong></p>
+            </div>
+        </div>
+        
+        <div class="back-link">
+            <a href="/">← Retour à l'accueil</a>
+        </div>
+    </div>
+    
+    <script>
+        let currentPhone = '';
+        let timerInterval = null;
+        
+        // Étape 1: Demander OTP
+        document.getElementById('phoneForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phone = document.getElementById('telephone').value;
+            const btn = document.getElementById('phoneBtn');
+            
+            btn.disabled = true;
+            btn.textContent = 'Envoi en cours...';
+            hideMessages();
+            
+            try {
+                const response = await fetch('/api/auth/demander-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ telephone: phone })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentPhone = phone;
+                    showSuccess('Code OTP envoyé avec succès ! Code: ' + data.otp_code);
+                    
+                    // Passer à l'étape 2
+                    setTimeout(() => {
+                        document.getElementById('phoneStep').style.display = 'none';
+                        document.getElementById('otpStep').style.display = 'block';
+                        document.getElementById('step2').classList.add('active');
+                        document.querySelector('.otp-digit').focus();
+                        startTimer();
+                    }, 2000);
+                } else {
+                    showError(data.error || 'Erreur lors de l\'envoi du code');
+                }
+            } catch (error) {
+                showError('Erreur de connexion au serveur');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Recevoir le code OTP';
+            }
+        });
+        
+        // Gestion des inputs OTP
+        const otpInputs = document.querySelectorAll('.otp-digit');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+        
+        // Étape 2: Vérifier OTP
+        document.getElementById('otpForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            
+            if (otp.length !== 6) {
+                showError('Veuillez entrer les 6 chiffres du code');
+                return;
+            }
+            
+            const btn = document.getElementById('otpBtn');
+            btn.disabled = true;
+            btn.textContent = 'Vérification...';
+            hideMessages();
+            
+            try {
+                const response = await fetch('/api/auth/verifier-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        telephone: currentPhone,
+                        otp_code: otp 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('Connexion réussie ! Redirection...');
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    localStorage.setItem('user_phone', currentPhone);
+                    localStorage.setItem('is_admin', data.is_admin);
+                    
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url || '/dashboard/';
+                    }, 1500);
+                } else {
+                    showError(data.error || 'Code invalide ou expiré');
+                    otpInputs.forEach(input => input.value = '');
+                    otpInputs[0].focus();
+                }
+            } catch (error) {
+                showError('Erreur de connexion au serveur');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Vérifier et se connecter';
+            }
+        });
+        
+        function startTimer() {
+            let timeLeft = 300; // 5 minutes
+            const timerEl = document.getElementById('timer');
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showError('Le code a expiré. Veuillez en demander un nouveau.');
+                }
+            }, 1000);
+        }
+        
+        function resendOTP() {
+            document.getElementById('otpStep').style.display = 'none';
+            document.getElementById('phoneStep').style.display = 'block';
+            document.getElementById('step2').classList.remove('active');
+            clearInterval(timerInterval);
+            otpInputs.forEach(input => input.value = '');
+        }
+        
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+        
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+        
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

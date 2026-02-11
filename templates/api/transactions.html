@@ -1,0 +1,117 @@
+{% extends 'api/base_v2.html' %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label>Filtrer par type:</label>
+    <select id="filterType" onchange="filterTransactions()">
+        <option value="all">Tous les types</option>
+        <option value="depot">Dépôts</option>
+        <option value="retrait">Retraits</option>
+        <option value="participation">Participations</option>
+        <option value="remboursement">Remboursements</option>
+    </select>
+</div>
+<script>
+function filterTransactions() {
+    const typeFilter = document.getElementById('filterType').value;
+    const cards = document.querySelectorAll('.data-card');
+    
+    cards.forEach(card => {
+        const cardText = card.textContent;
+        let showCard = true;
+        
+        if (typeFilter !== 'all') {
+            const typeMatch = {
+                'depot': '💵',
+                'retrait': '💸',
+                'participation': '🤝',
+                'remboursement': '♻️'
+            };
+            if (!card.querySelector('h3').textContent.includes(typeMatch[typeFilter])) {
+                showCard = false;
+            }
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ transactions|length }}</div>
+        <div class="stat-label">Transactions totales</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ depots }}</div>
+        <div class="stat-label">Dépôts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ retraits }}</div>
+        <div class="stat-label">Retraits</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ remboursements }}</div>
+        <div class="stat-label">Remboursements</div>
+    </div>
+</div>
+
+{% if transactions %}
+<div class="data-grid">
+    {% for transaction in transactions %}
+    <div class="data-card">
+        <h3>
+            {% if transaction.type_transaction == 'depot' %}💵
+            {% elif transaction.type_transaction == 'retrait' %}💸
+            {% elif transaction.type_transaction == 'participation' %}🤝
+            {% else %}♻️{% endif %}
+            {{ transaction.get_type_transaction_display }}
+        </h3>
+        <div class="data-item">
+            <span class="data-label">Portefeuille</span>
+            <span class="data-value">{{ transaction.portefeuille.utilisateur.telephone }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Montant</span>
+            <span class="data-value">
+                <strong style="font-size: 1.2em; 
+                    {% if transaction.type_transaction == 'depot' or transaction.type_transaction == 'remboursement' %}
+                    color: #28a745;
+                    {% else %}
+                    color: #dc3545;
+                    {% endif %}
+                ">
+                    {% if transaction.type_transaction == 'depot' or transaction.type_transaction == 'remboursement' %}+{% else %}-{% endif %}
+                    {{ transaction.montant|floatformat:0 }} GNF
+                </strong>
+            </span>
+        </div>
+        {% if transaction.conteneur %}
+        <div class="data-item">
+            <span class="data-label">Conteneur</span>
+            <span class="data-value">{{ transaction.conteneur.nom }}</span>
+        </div>
+        {% endif %}
+        <div class="data-item">
+            <span class="data-label">Description</span>
+            <span class="data-value">{{ transaction.description }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Date</span>
+            <span class="data-value">{{ transaction.date_transaction|date:"d/m/Y H:i:s" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <h2>Aucune transaction enregistrée</h2>
+    <p>L'historique des transactions apparaîtra ici</p>
+</div>
+{% endif %}
+{% endblock %}

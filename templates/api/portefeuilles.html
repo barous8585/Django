@@ -1,0 +1,72 @@
+{% extends 'api/base_v2.html' %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ portefeuilles|length }}</div>
+        <div class="stat-label">Portefeuilles actifs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ solde_total|floatformat:0 }}</div>
+        <div class="stat-label">Solde total (GNF)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ solde_moyen|floatformat:0 }}</div>
+        <div class="stat-label">Solde moyen (GNF)</div>
+    </div>
+</div>
+
+{% if portefeuilles %}
+<div class="data-grid">
+    {% for portefeuille in portefeuilles %}
+    <div class="data-card">
+        <h3>💰 {{ portefeuille.utilisateur.telephone }}</h3>
+        <div class="data-item">
+            <span class="data-label">Utilisateur</span>
+            <span class="data-value">{{ portefeuille.utilisateur.username }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Solde</span>
+            <span class="data-value">
+                <strong style="color: #28a745; font-size: 1.3em;">{{ portefeuille.solde|floatformat:0 }} GNF</strong>
+            </span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Téléphone vérifié</span>
+            <span class="data-value">
+                {% if portefeuille.utilisateur.is_phone_verified %}
+                <span class="badge badge-success">✓ Vérifié</span>
+                {% else %}
+                <span class="badge badge-warning">⏳ En attente</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Date de création</span>
+            <span class="data-value">{{ portefeuille.date_creation|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Dernière MAJ</span>
+            <span class="data-value">{{ portefeuille.date_mise_a_jour|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Transactions</span>
+            <span class="data-value">
+                <a href="/api/transactions/?portefeuille={{ portefeuille.id }}" style="color: #667eea;">
+                    Voir l'historique
+                </a>
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+    </svg>
+    <h2>Aucun portefeuille trouvé</h2>
+    <p>Les portefeuilles apparaîtront ici</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'api/base_v2.html' %}
+
+{% block content %}
+<style>
+    .proof-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .proof-image {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        margin: 30px auto;
+        display: block;
+    }
+    
+    .proof-details {
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .zoom-controls {
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .zoom-btn {
+        padding: 10px 20px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 0 5px;
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="proof-container">
+    <h2 style="text-align: center; margin-bottom: 30px;">Preuve de Paiement</h2>
+    
+    {% if participation.preuve_paiement %}
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomOut()">−</button>
+            <button class="zoom-btn" onclick="resetZoom()">100%</button>
+            <button class="zoom-btn" onclick="zoomIn()">+</button>
+            <button class="zoom-btn" onclick="fullscreen()">⛶</button>
+        </div>
+        
+        <img 
+            src="{{ participation.preuve_paiement.url }}" 
+            alt="Preuve de paiement" 
+            class="proof-image"
+            id="proofImage"
+            onclick="fullscreen()"
+            style="cursor: zoom-in;"
+        >
+        
+        <div class="proof-details">
+            <h3 style="color: var(--accent-color); margin-bottom: 20px;">Détails de la Participation</h3>
+            
+            <div class="data-item">
+                <span class="data-label">Utilisateur</span>
+                <span class="data-value">{{ participation.utilisateur.telephone }}</span>
+            </div>
+            
+            <div class="data-item">
+                <span class="data-label">Conteneur</span>
+                <span class="data-value">{{ participation.conteneur.nom }}</span>
+            </div>
+            
+            <div class="data-item">
+                <span class="data-label">Montant</span>
+                <span class="data-value"><strong>{{ participation.montant|floatformat:0 }} GNF</strong></span>
+            </div>
+            
+            <div class="data-item">
+                <span class="data-label">Référence Orange Money</span>
+                <span class="data-value">{{ participation.reference_paiement }}</span>
+            </div>
+            
+            <div class="data-item">
+                <span class="data-label">Date</span>
+                <span class="data-value">{{ participation.date_participation|date:"d/m/Y H:i" }}</span>
+            </div>
+            
+            <div class="data-item">
+                <span class="data-label">Statut</span>
+                <span class="data-value">
+                    {% if participation.valide %}
+                    <span class="badge badge-success">✓ Validé</span>
+                    {% else %}
+                    <span class="badge badge-warning">⏳ En attente</span>
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="data-item">
+                <span class="data-label">Fichier</span>
+                <span class="data-value">
+                    {{ file_info.name }}<br>
+                    <small>Taille: {{ file_info.size_mb }} MB | Format: {{ file_info.extension|upper }}</small>
+                </span>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            {% if not participation.valide %}
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="validate" class="btn btn-success">
+                    ✓ Valider le paiement
+                </button>
+            </form>
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="reject" class="btn btn-danger">
+                    ✗ Rejeter
+                </button>
+            </form>
+            {% endif %}
+            
+            <a href="/admin/core/participation/{{ participation.id }}/change/" class="btn btn-secondary">
+                ⚙️ Modifier dans l'admin
+            </a>
+            
+            <a href="/api/participations/" class="btn btn-secondary">
+                ← Retour à la liste
+            </a>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h2>Aucune preuve de paiement</h2>
+            <p>Le commerçant n'a pas encore fourni de preuve de paiement</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+let currentZoom = 1;
+const img = document.getElementById('proofImage');
+
+function zoomIn() {
+    currentZoom = Math.min(currentZoom + 0.2, 3);
+    img.style.transform = `scale(${currentZoom})`;
+    img.style.transition = 'transform 0.3s ease';
+}
+
+function zoomOut() {
+    currentZoom = Math.max(currentZoom - 0.2, 0.5);
+    img.style.transform = `scale(${currentZoom})`;
+    img.style.transition = 'transform 0.3s ease';
+}
+
+function resetZoom() {
+    currentZoom = 1;
+    img.style.transform = 'scale(1)';
+    img.style.transition = 'transform 0.3s ease';
+}
+
+function fullscreen() {
+    if (img.requestFullscreen) {
+        img.requestFullscreen();
+    } else if (img.webkitRequestFullscreen) {
+        img.webkitRequestFullscreen();
+    } else if (img.msRequestFullscreen) {
+        img.msRequestFullscreen();
+    }
+}
+</script>
+{% endblock %}

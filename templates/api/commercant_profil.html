@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - Commerçant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">📦 Tontine Digitale</h1>
+                <div class="flex gap-4">
+                    <a href="/commercant/dashboard/" class="hover:bg-blue-700 px-4 py-2 rounded transition">📊 Dashboard</a>
+                    <a href="/commercant/participer/" class="hover:bg-blue-700 px-4 py-2 rounded transition">➕ Participer</a>
+                    <a href="/commercant/historique/" class="hover:bg-blue-700 px-4 py-2 rounded transition">📜 Historique</a>
+                    <a href="/commercant/profil/" class="bg-blue-700 px-4 py-2 rounded">👤 Profil</a>
+                    <a href="/logout/" class="hover:bg-red-600 px-4 py-2 rounded transition">🚪 Déconnexion</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenu Principal -->
+        <div class="container mx-auto p-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Informations du Profil -->
+                <div class="bg-white rounded-lg shadow-xl p-8 mb-6">
+                    <div class="flex items-center gap-6 mb-6">
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-4xl">
+                            👤
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800" id="userName">Chargement...</h2>
+                            <p class="text-gray-600" id="userPhone">📱 -</p>
+                            <p class="text-sm text-green-600 font-semibold mt-1">✅ Compte Commerçant Actif</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Statistiques Rapides -->
+                        <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+                            <p class="text-blue-600 font-semibold mb-2">📊 Activité</p>
+                            <ul class="space-y-2 text-sm">
+                                <li><span class="font-semibold">Participations :</span> <span id="statParticipations">-</span></li>
+                                <li><span class="font-semibold">Commandes :</span> <span id="statCommandes">-</span></li>
+                                <li><span class="font-semibold">Total investi :</span> <span id="statTotal" class="text-green-600 font-bold">-</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Portefeuille -->
+                        <div class="bg-green-50 p-4 rounded-lg border-2 border-green-200">
+                            <p class="text-green-600 font-semibold mb-2">💰 Portefeuille</p>
+                            <p class="text-3xl font-bold text-green-800" id="walletBalance">-</p>
+                            <p class="text-sm text-gray-600 mt-2">Solde disponible</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations de Sécurité -->
+                <div class="bg-white rounded-lg shadow-xl p-8 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">🔐 Sécurité</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold">Authentification à deux facteurs (OTP)</p>
+                                <p class="text-sm text-gray-600">Code SMS à chaque connexion</p>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">✅ Actif</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold">Numéro de téléphone vérifié</p>
+                                <p class="text-sm text-gray-600" id="verifiedPhone">-</p>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">✅ Vérifié</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold">Dernière connexion</p>
+                                <p class="text-sm text-gray-600" id="lastLogin">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations Bancaires / Paiement -->
+                <div class="bg-white rounded-lg shadow-xl p-8 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">💳 Moyens de Paiement</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-4 bg-orange-50 border-2 border-orange-200 rounded-lg">
+                            <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl font-bold">
+                                OM
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold">Orange Money Guinée</p>
+                                <p class="text-sm text-gray-600" id="omPhone">Numéro : -</p>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">✅ Activé</span>
+                        </div>
+
+                        <button class="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition">
+                            ➕ Ajouter un moyen de paiement
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Support & Contact -->
+                <div class="bg-white rounded-lg shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">📞 Support & Contact</h3>
+                    
+                    <div class="space-y-3">
+                        <a href="tel:+224620000000" class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                            <span class="text-2xl">📱</span>
+                            <div>
+                                <p class="font-semibold">Service Client</p>
+                                <p class="text-sm text-gray-600">+224 620 000 000</p>
+                            </div>
+                        </a>
+
+                        <a href="https://wa.me/224620000000" target="_blank" class="flex items-center gap-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition">
+                            <span class="text-2xl">💬</span>
+                            <div>
+                                <p class="font-semibold">WhatsApp</p>
+                                <p class="text-sm text-gray-600">Discussion instantanée</p>
+                            </div>
+                        </a>
+
+                        <a href="mailto:support@tontinedigitale.com" class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                            <span class="text-2xl">✉️</span>
+                            <div>
+                                <p class="font-semibold">Email</p>
+                                <p class="text-sm text-gray-600">support@tontinedigitale.com</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charger les informations de l'utilisateur
+        async function loadUserInfo() {
+            try {
+                // TODO: Créer un endpoint API pour récupérer les infos du profil
+                // Pour l'instant, affichage de données par défaut
+                
+                // Récupérer le téléphone depuis les cookies ou session
+                const userPhone = '+224 620 000 000'; // À remplacer par la vraie donnée
+                
+                document.getElementById('userName').textContent = 'Commerçant Madina';
+                document.getElementById('userPhone').textContent = `📱 ${userPhone}`;
+                document.getElementById('verifiedPhone').textContent = userPhone;
+                document.getElementById('omPhone').textContent = `Numéro : ${userPhone}`;
+                document.getElementById('lastLogin').textContent = new Date().toLocaleString('fr-FR');
+
+                // Charger les statistiques depuis les participations
+                const response = await axios.get('/api/participations/?format=json');
+                const participations = response.data;
+                
+                const totalMontant = participations.reduce((sum, p) => sum + parseFloat(p.montant), 0);
+                const nbValidees = participations.filter(p => p.valide).length;
+                
+                document.getElementById('statParticipations').textContent = `${participations.length} (${nbValidees} validées)`;
+                document.getElementById('statCommandes').textContent = '0';
+                document.getElementById('statTotal').textContent = `${totalMontant.toLocaleString()} GNF`;
+
+                // Portefeuille (TODO: intégrer le vrai modèle Portefeuille)
+                document.getElementById('walletBalance').textContent = '0 GNF';
+                
+            } catch (error) {
+                console.error('Erreur chargement profil:', error);
+            }
+        }
+
+        // Charger les données au chargement de la page
+        loadUserInfo();
+    </script>
+</body>
+</html>

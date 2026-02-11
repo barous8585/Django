@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        .nav a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+        .category-tag {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .category-TEXTILE { background: #e3f2fd; color: #1976d2; }
+        .category-ELECTRO { background: #fff3e0; color: #f57c00; }
+        .category-BEAUTE { background: #fce4ec; color: #c2185b; }
+        .category-MAISON { background: #e8f5e9; color: #388e3c; }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .badge {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: white;
+            font-size: 0.95em;
+        }
+        .badge-verified { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .badge-gold { background: linear-gradient(135deg, #f2994a, #f2c94c); }
+        .badge-trade { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        .info-box {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        .info-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .info-value {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .section {
+            margin: 35px 0;
+        }
+        .section-title {
+            color: #667eea;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .description-box {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 25px;
+            border-radius: 15px;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.05em;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+        .highlight-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .highlight-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        .meta-item {
+            text-align: center;
+        }
+        .meta-label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        .meta-value {
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        .btn-contact {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: transform 0.3s;
+            margin-top: 20px;
+        }
+        .btn-contact:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/api/fournisseurs/">← Retour catalogue</a>
+            <a href="/">🏠 Accueil</a>
+        </div>
+
+        <div class="card">
+            <div class="header">
+                <span class="category-tag category-{{ fournisseur.categorie }}">
+                    {{ fournisseur.get_categorie_display }}
+                </span>
+                
+                <h1>{{ fournisseur.nom }}</h1>
+                
+                <div class="badges">
+                    <span class="badge {% if 'Verified' in fournisseur.badges_confiance %}badge-verified{% elif 'Gold' in fournisseur.badges_confiance %}badge-gold{% else %}badge-trade{% endif %}">
+                        {{ fournisseur.get_badge_icon }} {{ fournisseur.badges_confiance }}
+                    </span>
+                    {% if fournisseur.verifie %}
+                    <span class="status-badge">
+                        ✓ Fournisseur vérifié
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-icon">🏭</div>
+                    <div class="info-label">Spécialité</div>
+                    <div class="info-value">{{ fournisseur.specialite }}</div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-icon">📦</div>
+                    <div class="info-label">Commande minimum (MOQ)</div>
+                    <div class="info-value">{{ fournisseur.moq }}</div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-icon">🌍</div>
+                    <div class="info-label">Pays d'origine</div>
+                    <div class="info-value">{{ fournisseur.get_pays_origine_display }}</div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-icon">⏳</div>
+                    <div class="info-label">Expérience</div>
+                    <div class="info-value">{{ fournisseur.annees_experience }} ans</div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <div class="highlight-title">💡 Pourquoi choisir ce fournisseur ?</div>
+                <div class="highlight-text">{{ fournisseur.argument_vente }}</div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">🛡️ Critères de confiance</h3>
+                <div class="description-box">
+                    <strong>{{ fournisseur.badges_confiance }}</strong>
+                    <ul style="margin-top: 15px; margin-left: 20px; line-height: 2;">
+                        {% if 'Verified' in fournisseur.badges_confiance %}
+                        <li>✓ Fournisseur vérifié par Alibaba/1688</li>
+                        {% endif %}
+                        {% if 'Trade Assurance' in fournisseur.badges_confiance %}
+                        <li>✓ Protection Trade Assurance active</li>
+                        {% endif %}
+                        {% if 'Gold' in fournisseur.badges_confiance %}
+                        <li>✓ Membre Gold avec historique excellent</li>
+                        {% endif %}
+                        {% if 'SGS' in fournisseur.badges_confiance %}
+                        <li>✓ Usine inspectée physiquement (SGS)</li>
+                        {% endif %}
+                        {% if 'ISO' in fournisseur.badges_confiance %}
+                        <li>✓ Certifications ISO qualité</li>
+                        {% endif %}
+                        <li>✓ {{ fournisseur.annees_experience }} années d'expérience prouvée</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">📋 Produits proposés</h3>
+                <div class="description-box">
+                    {{ fournisseur.specialite }}
+                </div>
+            </div>
+
+            <div class="meta-info">
+                <div class="meta-item">
+                    <div class="meta-label">Date d'ajout</div>
+                    <div class="meta-value">{{ fournisseur.date_ajout|date:"d/m/Y" }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Catégorie</div>
+                    <div class="meta-value">{{ fournisseur.get_categorie_display }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Statut</div>
+                    <div class="meta-value">{% if fournisseur.verifie %}✓ Vérifié{% else %}En attente{% endif %}</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="color: #666; margin-bottom: 15px; font-size: 1.1em;">
+                    Intéressé par ce fournisseur ? Contactez l'administrateur pour plus d'informations.
+                </p>
+                <a href="/contact/" class="btn-contact">
+                    📞 Demander un contact
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

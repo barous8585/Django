@@ -1,0 +1,139 @@
+{% extends 'api/base_v2.html' %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label>Filtrer par étape:</label>
+    <select id="filterEtape" onchange="filterConteneurs()">
+        <option value="all">Toutes les étapes</option>
+        <option value="collecte">Collecte</option>
+        <option value="mer">En Mer</option>
+        <option value="port">Au Port</option>
+    </select>
+    
+    <label>Filtrer par progression:</label>
+    <select id="filterProgress" onchange="filterConteneurs()">
+        <option value="all">Toutes progressions</option>
+        <option value="complete">Complétés (100%)</option>
+        <option value="high">Avancés (50-99%)</option>
+        <option value="low">Début (0-49%)</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ conteneurs|length }}</div>
+        <div class="stat-label">Conteneurs actifs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_objectif|floatformat:0 }}</div>
+        <div class="stat-label">Objectif total (GNF)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_collecte|floatformat:0 }}</div>
+        <div class="stat-label">Montant collecté (GNF)</div>
+    </div>
+</div>
+
+{% if conteneurs %}
+<div class="data-grid">
+    {% for conteneur in conteneurs %}
+    <div class="data-card">
+        <h3>📦 {{ conteneur.nom }}</h3>
+        <div class="data-item">
+            <span class="data-label">Objectif</span>
+            <span class="data-value">{{ conteneur.objectif|floatformat:0 }} {{ conteneur.devise }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Montant actuel</span>
+            <span class="data-value">{{ conteneur.montant_actuel|floatformat:0 }} GNF</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Progression</span>
+            <span class="data-value">
+                {% widthratio conteneur.montant_actuel conteneur.objectif 100 %}%
+                {% if conteneur.montant_actuel >= conteneur.objectif %}
+                <span class="badge badge-success">✓ Complété</span>
+                {% else %}
+                <span class="badge badge-warning">En cours</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Étape</span>
+            <span class="data-value">
+                {% if conteneur.etape == 'collecte' %}
+                <span class="badge badge-warning">🔄 Collecte</span>
+                {% elif conteneur.etape == 'mer' %}
+                <span class="badge badge-warning">🚢 En Mer</span>
+                {% else %}
+                <span class="badge badge-success">🏠 Au Port</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Date de création</span>
+            <span class="data-value">{{ conteneur.date_creation|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Participations</span>
+            <span class="data-value">{{ conteneur.participation_set.count }} participant(s)</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Actions</span>
+            <span class="data-value">
+                <a href="/api/conteneurs/{{ conteneur.id }}/" style="color: #667eea;">Voir détails →</a>
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function filterConteneurs() {
+    const etapeFilter = document.getElementById('filterEtape').value;
+    const progressFilter = document.getElementById('filterProgress').value;
+    const cards = document.querySelectorAll('.data-card');
+    
+    cards.forEach(card => {
+        let showCard = true;
+        const cardText = card.textContent;
+        
+        // Filter by étape
+        if (etapeFilter !== 'all') {
+            const etapeMatch = {
+                'collecte': '🔄 Collecte',
+                'mer': '🚢 En Mer',
+                'port': '🏠 Au Port'
+            };
+            if (!cardText.includes(etapeMatch[etapeFilter])) {
+                showCard = false;
+            }
+        }
+        
+        // Filter by progression
+        if (progressFilter !== 'all' && showCard) {
+            const progressMatch = cardText.match(/(\d+)%/);
+            if (progressMatch) {
+                const progress = parseInt(progressMatch[1]);
+                if (progressFilter === 'complete' && progress < 100) showCard = false;
+                if (progressFilter === 'high' && (progress < 50 || progress >= 100)) showCard = false;
+                if (progressFilter === 'low' && progress >= 50) showCard = false;
+            }
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+}
+</script>
+{% else %}
+<div class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+    </svg>
+    <h2>Aucun conteneur disponible</h2>
+    <p>Les conteneurs créés apparaîtront ici</p>
+</div>
+{% endif %}
+{% endblock %}

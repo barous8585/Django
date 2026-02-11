@@ -1,0 +1,102 @@
+{% extends 'api/base_v2.html' %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label>Filtrer par statut:</label>
+    <select id="filterStatus" onchange="filterParticipations()">
+        <option value="all">Tous</option>
+        <option value="valide">Validés</option>
+        <option value="attente">En attente</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ participations|length }}</div>
+        <div class="stat-label">Participations totales</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ validees }}</div>
+        <div class="stat-label">Validées</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ en_attente }}</div>
+        <div class="stat-label">En attente</div>
+    </div>
+</div>
+
+{% if participations %}
+<div class="data-grid">
+    {% for participation in participations %}
+    <div class="data-card">
+        <h3>🤝 {{ participation.utilisateur.telephone }}</h3>
+        <div class="data-item">
+            <span class="data-label">Conteneur</span>
+            <span class="data-value">{{ participation.conteneur.nom }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Montant</span>
+            <span class="data-value">{{ participation.montant|floatformat:0 }} GNF</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Référence</span>
+            <span class="data-value">{{ participation.reference_paiement }}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-label">Statut</span>
+            <span class="data-value">
+                {% if participation.valide %}
+                <span class="badge badge-success">✓ Validé</span>
+                {% else %}
+                <span class="badge badge-warning">⏳ En attente</span>
+                {% endif %}
+            </span>
+        </div>
+        {% if participation.preuve_paiement %}
+        <div class="data-item">
+            <span class="data-label">Preuve</span>
+            <span class="data-value">
+                <a href="{{ participation.preuve_paiement.url }}" target="_blank" style="color: #667eea;">📸 Voir la preuve</a>
+            </span>
+        </div>
+        {% endif %}
+        <div class="data-item">
+            <span class="data-label">Date</span>
+            <span class="data-value">{{ participation.date_participation|date:"d/m/Y H:i" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function filterParticipations() {
+    const statusFilter = document.getElementById('filterStatus').value;
+    const cards = document.querySelectorAll('.data-card');
+    
+    cards.forEach(card => {
+        const cardText = card.textContent;
+        let showCard = true;
+        
+        if (statusFilter === 'valide' && !cardText.includes('✓ Validé')) {
+            showCard = false;
+        } else if (statusFilter === 'attente' && !cardText.includes('⏳ En attente')) {
+            showCard = false;
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+}
+</script>
+
+{% else %}
+<div class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <h2>Aucune participation enregistrée</h2>
+    <p>Les participations apparaîtront ici</p>
+</div>
+{% endif %}
+{% endblock %}
