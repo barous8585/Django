@@ -183,6 +183,9 @@ SIMPLE_JWT = {
 # Configuration WhiteNoise pour servir les fichiers statiques en production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Créer le dossier staticfiles s'il n'existe pas
+os.makedirs(STATIC_ROOT, exist_ok=True)
+
 # SÉCURITÉ RENFORCÉE (Production)
 if not DEBUG:
     # Force HTTPS
